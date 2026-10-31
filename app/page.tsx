@@ -4,7 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { mockSewadars } from '@/data/mockSewadars';
 import SewaTabs, { DashboardTab } from '@/components/dashboard/SewaTabs';
 import SewadarTable from '@/components/dashboard/SewadarTable';
-import { Search, RotateCcw, Filter, SlidersHorizontal } from 'lucide-react';
+import { exportSewadarsToExcel } from '@/lib/exportToExcel';
+import { Search, RotateCcw, Filter, SlidersHorizontal, FileDown } from 'lucide-react';
 
 export default function DashboardPage() {
   const [tick, setTick] = useState<number>(0);
@@ -80,6 +81,11 @@ export default function DashboardPage() {
     query || selectedCentre !== 'ALL' || selectedArea !== 'ALL' || dateFrom || dateTo
   );
 
+  const handleExport = () => {
+    const roleLabel = activeTab === 'ALL' ? 'All_Sewadars' : `${activeTab}_Records`;
+    exportSewadarsToExcel(filteredData, `Satsang_${roleLabel}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header Section & 4 Sewa Buttons */}
@@ -91,6 +97,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
+        {/* 4 Header Buttons: All Sewadars, SK, Pathi, SR */}
         <SewaTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -100,7 +107,7 @@ export default function DashboardPage() {
 
       {/* Embedded Search & Filter Card */}
       <div className="bg-white border border-[#D1D5DB] rounded shadow-xs overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#FAFAFA] flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[#7A1315]">
             <Filter size={15} />
             <h2 className="text-xs font-bold uppercase tracking-wider">Search & Filters</h2>
@@ -112,19 +119,29 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* EXPORT TO EXCEL BUTTON */}
+            <button
+              onClick={handleExport}
+              title="Download Excel spreadsheet of currently displayed records"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-[#107C41] text-white hover:bg-[#0c6233] shadow-2xs transition-colors"
+            >
+              <FileDown size={14} />
+              <span>Export Excel ({filteredData.length})</span>
+            </button>
+
             {isAnyFilterActive && (
               <button
                 onClick={handleResetFilters}
-                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded text-[#7A1315] hover:bg-[#F8EBEB] transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold rounded text-[#7A1315] hover:bg-[#F8EBEB] transition-colors"
               >
                 <RotateCcw size={12} />
-                <span>Reset Filters</span>
+                <span>Reset</span>
               </button>
             )}
 
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded border border-[#D1D5DB] text-[#4B5563] bg-white hover:bg-[#ECECEC] transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold rounded border border-[#D1D5DB] text-[#4B5563] bg-white hover:bg-[#ECECEC] transition-colors"
             >
               <SlidersHorizontal size={12} />
               <span>{isFilterOpen ? 'Hide' : 'Show'} Filters</span>

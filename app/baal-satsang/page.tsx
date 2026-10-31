@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import { mockSewadars } from '@/data/mockSewadars';
 import SewadarTable from '@/components/dashboard/SewadarTable';
-import { Sparkles, Search, RotateCcw, Filter, SlidersHorizontal } from 'lucide-react';
+import { exportSewadarsToExcel } from '@/lib/exportToExcel';
+import { Baby, Search, RotateCcw, Filter, SlidersHorizontal, FileDown } from 'lucide-react';
 
 export default function BaalSatsangPage() {
-  // Trigger state for re-rendering when an edit is saved
   const [tick, setTick] = useState<number>(0);
 
   // Filter States
@@ -22,7 +22,6 @@ export default function BaalSatsangPage() {
     return mockSewadars.filter((item) => item.category === 'Baal Satsang');
   }, [tick]);
 
-  // Dropdown list sets
   const centres = useMemo(() => {
     return Array.from(new Set(allBskMembers.map((s) => s.centre)));
   }, [allBskMembers]);
@@ -31,37 +30,26 @@ export default function BaalSatsangPage() {
     return Array.from(new Set(allBskMembers.map((s) => s.area)));
   }, [allBskMembers]);
 
-  // Apply filters
   const filteredData = useMemo(() => {
     return allBskMembers.filter((item) => {
-      // 1. Search (Name or I No.)
       if (query.trim()) {
         const q = query.toLowerCase().trim();
         const matchesName = item.name.toLowerCase().includes(q);
         const matchesINo = item.iNo.toLowerCase().includes(q);
         if (!matchesName && !matchesINo) return false;
       }
-
-      // 2. Centre
       if (selectedCentre !== 'ALL' && item.centre !== selectedCentre) {
         return false;
       }
-
-      // 3. Area
       if (selectedArea !== 'ALL' && item.area !== selectedArea) {
         return false;
       }
-
-      // 4. Date From
       if (dateFrom && item.dateOfJoining < dateFrom) {
         return false;
       }
-
-      // 5. Date To
       if (dateTo && item.dateOfJoining > dateTo) {
         return false;
       }
-
       return true;
     });
   }, [allBskMembers, query, selectedCentre, selectedArea, dateFrom, dateTo]);
@@ -78,6 +66,10 @@ export default function BaalSatsangPage() {
     query || selectedCentre !== 'ALL' || selectedArea !== 'ALL' || dateFrom || dateTo
   );
 
+  const handleExport = () => {
+    exportSewadarsToExcel(filteredData, 'Baal_Satsang_Karta');
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
@@ -85,7 +77,7 @@ export default function BaalSatsangPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1 rounded bg-[#F8EBEB] text-[#7A1315]">
-              <Sparkles size={18} />
+              <Baby size={18} />
             </span>
             <h1 className="text-xl font-bold text-[#1F2937]">Baal Satsang Karta (BSKs)</h1>
           </div>
@@ -94,19 +86,27 @@ export default function BaalSatsangPage() {
           </p>
         </div>
 
-        {/* Count indicator button */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded bg-white border border-[#D1D5DB] text-xs font-semibold text-[#1F2937] shadow-xs">
-          <span>Total BSKs:</span>
-          <span className="px-2 py-0.5 rounded-full bg-[#7A1315] text-white text-[11px] font-bold">
-            {allBskMembers.length}
-          </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-[#107C41] text-white hover:bg-[#0c6233] shadow-2xs transition-colors"
+          >
+            <FileDown size={14} />
+            <span>Export Excel ({filteredData.length})</span>
+          </button>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-white border border-[#D1D5DB] text-xs font-semibold text-[#1F2937] shadow-xs">
+            <span>Total:</span>
+            <span className="px-2 py-0.5 rounded-full bg-[#7A1315] text-white text-[11px] font-bold">
+              {allBskMembers.length}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Baal Satsang Filter Card */}
+      {/* Filter Card */}
       <div className="bg-white border border-[#D1D5DB] rounded shadow-xs overflow-hidden">
-        {/* Filter Card Header */}
-        <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#FAFAFA] flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[#7A1315]">
             <Filter size={15} />
             <h2 className="text-xs font-bold uppercase tracking-wider">Search & Filters</h2>
@@ -121,16 +121,16 @@ export default function BaalSatsangPage() {
             {isAnyFilterActive && (
               <button
                 onClick={handleResetFilters}
-                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded text-[#7A1315] hover:bg-[#F8EBEB] transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold rounded text-[#7A1315] hover:bg-[#F8EBEB] transition-colors"
               >
                 <RotateCcw size={12} />
-                <span>Reset Filters</span>
+                <span>Reset</span>
               </button>
             )}
 
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded border border-[#D1D5DB] text-[#4B5563] bg-white hover:bg-[#ECECEC] transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold rounded border border-[#D1D5DB] text-[#4B5563] bg-white hover:bg-[#ECECEC] transition-colors"
             >
               <SlidersHorizontal size={12} />
               <span>{isFilterOpen ? 'Hide' : 'Show'} Filters</span>
@@ -138,11 +138,9 @@ export default function BaalSatsangPage() {
           </div>
         </div>
 
-        {/* Inputs */}
         {isFilterOpen && (
           <div className="p-5 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              {/* Search */}
               <div>
                 <label className="block font-semibold text-[#374151] mb-1.5">Search Name / I No.</label>
                 <div className="relative">
@@ -157,7 +155,6 @@ export default function BaalSatsangPage() {
                 </div>
               </div>
 
-              {/* Centre */}
               <div>
                 <label className="block font-semibold text-[#374151] mb-1.5">Centre</label>
                 <select
@@ -172,7 +169,6 @@ export default function BaalSatsangPage() {
                 </select>
               </div>
 
-              {/* Area */}
               <div>
                 <label className="block font-semibold text-[#374151] mb-1.5">Area</label>
                 <select
@@ -187,7 +183,6 @@ export default function BaalSatsangPage() {
                 </select>
               </div>
 
-              {/* Dates */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block font-semibold text-[#374151] mb-1.5">From Date</label>
@@ -210,7 +205,6 @@ export default function BaalSatsangPage() {
               </div>
             </div>
 
-            {/* Results Counter Line */}
             <div className="pt-2 text-[11px] text-[#6B7280] flex justify-between items-center border-t border-[#F3F4F6]">
               <span>
                 Showing <strong>{filteredData.length}</strong> BSK record{filteredData.length !== 1 ? 's' : ''}
@@ -223,7 +217,7 @@ export default function BaalSatsangPage() {
         )}
       </div>
 
-      {/* Main Table with Expandable History & Pagination */}
+      {/* Main Table */}
       <SewadarTable 
         data={filteredData} 
         onDataRefresh={() => setTick((t) => t + 1)} 
