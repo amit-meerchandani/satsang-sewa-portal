@@ -15,36 +15,33 @@ export interface HistoryRecord {
 export interface Sewadar {
   srNo: number;
   iNo: string;
-  beasId: string;
   name: string;
-  photoUrl?: string; // Optional image URL / file path
-  gender: 'Male' | 'Female' | 'Other';
-  dob: string;
-  age: number;
-  fatherName: string;
-  motherName: string;
-  marriageStatus: 'Married' | 'Unmarried' | 'Widowed' | 'Divorced';
-  spouseName?: string;
-  aadharNumber: string;
-  address: string;
-  phone: string;
-  email: string;
-
-  // Overview / Status details (Right Card)
-  initiationDate: string;
-  status: 'Active' | 'Inactive' | 'On Leave' | 'Transferred';
-  qualification: string;
-  profession: string;
-  professionDetail?: string;
-  dateOfJoining: string;
-  exitDate?: string;
-  remarks: string;
-
-  // Table summary fields
   centre: string;
   area: string;
   sewa: SewaRole;
+  dateOfJoining: string;
   category: 'Regular' | 'Baal Satsang';
-
   history: HistoryRecord[];
+
+  // Optional personal dossier fields
+  beasId?: string;
+  photoUrl?: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  dob?: string;
+  age?: number;
+  fatherName?: string;
+  motherName?: string;
+  marriageStatus?: 'Married' | 'Unmarried' | 'Widowed' | 'Divorced';
+  spouseName?: string;
+  aadharNumber?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  initiationDate?: string;
+  status?: 'Active' | 'Inactive' | 'On Leave' | 'Transferred';
+  qualification?: string;
+  profession?: string;
+  professionDetail?: string;
+  exitDate?: string;
+  remarks?: string;
 }
