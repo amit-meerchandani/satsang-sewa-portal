@@ -23,7 +23,7 @@ export default function AddNewPage() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
 
-  // Initial Appointment History Log Fields
+  // Initial Appointment History Log Fields (Status must match HistoryRecord['status'])
   const [historyStatus, setHistoryStatus] = useState<HistoryRecord['status']>('Appointed');
   const [letterId, setLetterId] = useState('');
   const [remarks, setRemarks] = useState('Appointed by SCI');
