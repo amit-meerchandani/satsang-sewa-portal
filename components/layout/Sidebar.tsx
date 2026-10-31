@@ -67,7 +67,7 @@ export default function Sidebar() {
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div>
+        <div> 
           {/* Header inside drawer */}
           <div className="pt-6 pb-4 px-4 flex flex-col items-center justify-center text-center relative border-b border-[#D1D5DB]/60">
             <button
